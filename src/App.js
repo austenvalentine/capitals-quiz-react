@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { SwitchTransition, Transition } from "react-transition-group";
+import GameScreen from "./components/GameScreen";
+// import AnswerScreen from "./components/AnswersScreen";
 
 function App() {
+  const [inProp, setInProp] = useState(false);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SwitchTransition mode="in-out">
+        <Transition in={inProp} key="appScreen" timeout={100}>
+          {GameScreen}
+        </Transition>
+      </SwitchTransition>
+      <button
+        onClick={() => {
+          setInProp(inProp ? false : true);
+        }}
+      >
+        TOggle!
+      </button>
     </div>
   );
 }
