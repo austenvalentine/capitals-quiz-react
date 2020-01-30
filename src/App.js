@@ -4,7 +4,9 @@ import RegionHeader from "./components/RegionHeader";
 import CurrentCountry from "./components/CurrentCountry";
 import CapitalsList from "./components/CapitalsList";
 
-// Capitals Quiz
+// Capitals Quiz - breakdown
+// 1. download list of countries and add to "deck" (App.js)
+// 2. pick 4 countries at random for multiple-choice options (App.js)
 // 3. when user selects an option, show correct/incorrect
 // 4. go back to step 2 until fewer than 4 countries remain in the deck
 // 5. go back to step 1
@@ -15,7 +17,7 @@ function App() {
   // ===============================================
   // 1. download list of countries and add to "deck"
   // ===============================================
-  //    define reusable function to get countries and capitals from API
+  //    define function to get countries and capitals from API
   function fetchCountries() {
     axios
       .get("https://restcountries.eu/rest/v2/region/africa")
@@ -27,15 +29,17 @@ function App() {
   // trigger API call on first render
   useEffect(() => {
     fetchCountries();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ===============================================
   // 2. pick 4 countries at random for multiple-choice options
   // ===============================================
+  // define function to randomly pick 4 countries and remove them from the
+  // countriesDeck array.
   function getNextOptions() {
     // copy the countriesDeck state for mutation (filtering elements)
     let deckCopy = [...countriesDeck];
+    console.log("getNextOptions: ", deckCopy);
     // an array in which to store the randomly-selected countries
     const options = [];
     for (let i = 0; i < 4; i++) {
@@ -55,19 +59,26 @@ function App() {
   }
 
   // trigger fetch when countriesDeck is low or empty
-  useEffect(() => {
-    if (!countriesDeck || countriesDeck.length < 4) {
-      fetchCountries();
-      getNextOptions();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countriesDeck]);
+  // useEffect(() => {
+  //   if (countriesDeck.length < 4) {
+  //     console.log("countriesDeck.length < 4");
+  //     fetchCountries();
+  //     // getNextOptions();
+  //   }
 
+  //   // getNextOptions();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [countriesDeck]);
+
+  // ===============================================
+  // 3. when user selects an option, show correct/incorrect
+  // ===============================================
   return (
     <div className="App" style={{ background: "#cc8833", height: "100vh" }}>
       <RegionHeader></RegionHeader>
       <CurrentCountry country={null}></CurrentCountry>
       <CapitalsList capitals={capitalsOptions}></CapitalsList>
+      <button onClick={getNextOptions}>Next Question</button>
     </div>
   );
 }
