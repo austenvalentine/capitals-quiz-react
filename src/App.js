@@ -12,6 +12,8 @@ import CapitalsList from "./components/CapitalsList";
 // 5. go back to step 1
 
 function App() {
+  const optionCount = 4;
+
   const [countriesDeck, setCountriesDeck] = useState([]);
   const [capitalsOptions, setCapitalsOptions] = useState([]);
   // ===============================================
@@ -22,63 +24,57 @@ function App() {
     axios
       .get("https://restcountries.eu/rest/v2/region/africa")
       .then(function(response) {
-        setCountriesDeck(response.data);
-        console.log(response.data);
+        console.log("RESPONSE: ", response.data);
+        const { countries, options } = getNextOptions(response.data);
+        console.log("STATE: ", options, countries);
+        setCountriesDeck(countries);
+        setCapitalsOptions(options);
       });
   }
-  // trigger API call on first render
-  useEffect(() => {
-    fetchCountries();
-  }, []);
 
   // ===============================================
   // 2. pick 4 countries at random for multiple-choice options
   // ===============================================
   // define function to randomly pick 4 countries and remove them from the
   // countriesDeck array.
-  function getNextOptions() {
-    // copy the countriesDeck state for mutation (filtering elements)
-    let deckCopy = [...countriesDeck];
-    console.log("getNextOptions: ", deckCopy);
+  function getNextOptions(countries) {
     // an array in which to store the randomly-selected countries
     const options = [];
-    for (let i = 0; i < 4; i++) {
-      const randIndex = Math.floor(Math.random() * deckCopy.length);
-      const randCountry = deckCopy[randIndex];
+    for (let i = 0; i < optionCount; i++) {
+      const randIndex = Math.floor(Math.random() * countries.length);
+      const randCountry = countries[randIndex];
       options.push(randCountry);
       // remove randomly picked country from deck
-      deckCopy = deckCopy.filter(country => {
+      countries = countries.filter(country => {
         return randCountry !== country;
       });
     }
-    console.log(options);
-    // update deck state to exclude removed countries
-    setCountriesDeck(deckCopy);
-    // put the picked countries into state
-    setCapitalsOptions(options);
+    // return new array of countries and array of options
+    return { countries, options };
   }
 
   // trigger fetch when countriesDeck is low or empty
-  // useEffect(() => {
-  //   if (countriesDeck.length < 4) {
-  //     console.log("countriesDeck.length < 4");
-  //     fetchCountries();
-  //     // getNextOptions();
-  //   }
+  useEffect(() => {
+    if (countriesDeck.length < optionCount) {
+      fetchCountries();
+    }
 
-  //   // getNextOptions();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [countriesDeck]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countriesDeck]);
 
-  // ===============================================
-  // 3. when user selects an option, show correct/incorrect
-  // ===============================================
+  // user-triggered question generation
+  const handleClick = () => {
+    const { countries, options } = getNextOptions(countriesDeck);
+    setCountriesDeck(countries);
+    setCapitalsOptions(options);
+  };
+
   return (
     <div className="App" style={{ background: "#cc8833", height: "100vh" }}>
       <RegionHeader></RegionHeader>
-      <CurrentCountry country={null}></CurrentCountry>
+      <CurrentCountry country={capitalsOptions[0]}></CurrentCountry>
       <CapitalsList capitals={capitalsOptions}></CapitalsList>
-      <button onClick={getNextOptions}>Next Question</button>
+      <button onClick={handleClick}>Next Question</button>
     </div>
   );
 }
