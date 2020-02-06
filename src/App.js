@@ -25,11 +25,11 @@ function App() {
       "https://restcountries.eu/rest/v2/region/africa"
     );
     const data = await response.json();
-    setCountries(data);
+    pickCountries(data);
   }
 
   // pick the countries at random
-  function pickCountries() {
+  function pickCountries(countries = countries) {
     let _countries = [...countries];
     const _countryOptions = [];
     for (let i = 0; i < numberOfOptions; i++) {
@@ -53,8 +53,9 @@ function App() {
     (async function() {
       if (countries.length < numberOfOptions) {
         await fetchCountries();
+      } else {
+        pickCountries();
       }
-      pickCountries();
       console.log("handleClick:", countries, countryOptions);
     })();
   }
