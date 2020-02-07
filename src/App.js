@@ -22,15 +22,15 @@ function App() {
 
   // pick the countries at random
   function pickRandomCountries() {
-    const { set: _countries, subset: options } = sliceRandomSubset(
+    const { set: newCountries, subset: options } = sliceRandomSubset(
       numberOfOptions,
       countries
     );
     // TODO === don't use underscore. Go with newCountries.
-    setCountries(_countries);
+    setCountries(newCountries);
     setCountryOptions(options);
 
-    if (_countries && _countries.length < numberOfOptions) {
+    if (newCountries && newCountries.length < numberOfOptions) {
       setCountries([...allCountries]);
     }
   }
@@ -45,12 +45,12 @@ function App() {
         "https://restcountries.eu/rest/v2/region/africa"
       );
       const data = await response.json();
-      const { set: _countries, subset: options } = sliceRandomSubset(
+      const { set: newCountries, subset: options } = sliceRandomSubset(
         numberOfOptions,
         data
       );
       setAllCountries(data);
-      setCountries(_countries);
+      setCountries(newCountries);
       setCountryOptions(options);
     };
     fetchCountries();
@@ -72,4 +72,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
