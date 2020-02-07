@@ -17,7 +17,7 @@ import CapitalsList from "./components/CapitalsList";
 function App() {
   const numberOfOptions = 4;
   const [countries, setCountries] = useState([]);
-  const [countriesCache, setCountriesCache] = useState([]);
+  const [allCountries, setAllCountries] = useState([]);
   const [countryOptions, setCountryOptions] = useState([]);
 
   // pick the countries at random
@@ -29,6 +29,10 @@ function App() {
     // TODO === don't use underscore. Go with newCountries.
     setCountries(_countries);
     setCountryOptions(options);
+
+    if (_countries && _countries.length < numberOfOptions) {
+      setCountries([...allCountries]);
+    }
   }
   // ===============================================
   // 1. download list of countries, add to cache and add to "deck"
@@ -45,7 +49,7 @@ function App() {
         numberOfOptions,
         data
       );
-      setCountriesCache(data);
+      setAllCountries(data);
       setCountries(_countries);
       setCountryOptions(options);
     };
@@ -54,14 +58,6 @@ function App() {
 
   // if the number of available countries ever becomes less than
   // the number of options, replenish countries from the countriesCache
-  useEffect(
-    function() {
-      if (countries && countries.length < numberOfOptions) {
-        setCountries([...countriesCache]);
-      }
-    },
-    [countries, countriesCache]
-  );
 
   return (
     <div className="App" style={{ background: "#cc8833", height: "100vh" }}>
