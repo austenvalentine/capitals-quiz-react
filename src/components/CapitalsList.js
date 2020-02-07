@@ -10,10 +10,10 @@ function CapitalsList(props) {
     <div>
       <ul>
         {[
-          <CapitalOption capital={capitals[0] || "hi"}></CapitalOption>,
-          <CapitalOption capital={capitals[1] || "hi"}></CapitalOption>,
-          <CapitalOption capital={capitals[2] || "hi"}></CapitalOption>,
-          <CapitalOption capital={capitals[3] || "hi"}></CapitalOption>
+          <CapitalOption capital={capitals[0] || "hi"} key="a"></CapitalOption>,
+          <CapitalOption capital={capitals[1] || "hi"} key="b"></CapitalOption>,
+          <CapitalOption capital={capitals[2] || "hi"} key="c"></CapitalOption>,
+          <CapitalOption capital={capitals[3] || "hi"} key="d"></CapitalOption>
         ]}
       </ul>
     </div>

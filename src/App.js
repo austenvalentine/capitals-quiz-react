@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from "react";
-// import axios from "axios";
+import React, { useEffect, useState } from "react";
+import sliceRandomSubset from "./helpers/helper.js";
 import RegionHeader from "./components/RegionHeader";
 import CurrentCountry from "./components/CurrentCountry";
 import CapitalsList from "./components/CapitalsList";
@@ -9,66 +9,63 @@ import CapitalsList from "./components/CapitalsList";
 // 3. when user selects an option, show correct/incorrect
 // 4. go back to step 2 until fewer than 4 countries remain in the deck
 // 5. go back to step 1
+
 function App() {
   const numberOfOptions = 4;
   const [countries, setCountries] = useState([]);
+  const [countriesCache, setCountriesCache] = useState([]);
   const [countryOptions, setCountryOptions] = useState([]);
-  // ===============================================
-  // 1. download list of countries and add to "deck"
-  // ===============================================
-  //    define function to get countries and capitals from API
+
   // pick the countries at random
-  const pickCountries = useCallback(
-    function pickCountries(countries) {
-      let _countries = [...countries];
-      const _countryOptions = [];
-      for (let i = 0; i < numberOfOptions; i++) {
-        const randomIndex = Math.floor(Math.random() * _countries.length);
-        const pickedCountry = _countries[randomIndex];
-        _countryOptions.push(pickedCountry);
-        _countries = _countries.filter(country => {
-          return pickedCountry !== country;
-        });
-      }
-      setCountries(_countries);
-      setCountryOptions(_countryOptions);
-      console.log("pickCountries:", countries, countryOptions);
-    },
-    [countryOptions]
-  );
-  const fetchCountries = useCallback(
-    async function fetchCountries() {
+  function pickRandomCountries() {
+    const { set: _countries, subset: options } = sliceRandomSubset(
+      numberOfOptions,
+      countries
+    );
+    setCountries(_countries);
+    setCountryOptions(options);
+  }
+  // ===============================================
+  // 1. download list of countries, add to cache and add to "deck"
+  // ===============================================
+  useEffect(function() {
+    const fetchCountries = async function() {
       const response = await fetch(
         "https://restcountries.eu/rest/v2/region/africa"
       );
       const data = await response.json();
-      pickCountries(data);
-    },
-    [pickCountries]
-  );
+      const { set: _countries, subset: options } = sliceRandomSubset(
+        numberOfOptions,
+        data
+      );
+      setCountriesCache(data);
+      setCountries(_countries);
+      setCountryOptions(options);
+    };
+    fetchCountries();
+  }, []);
+
+  // if the number of available countries ever becomes less than
+  // the number of options, replenish countries from the countriesCache
   useEffect(
     function() {
-      if (countries.length < numberOfOptions) {
-        fetchCountries();
+      if (countries && countries.length < numberOfOptions) {
+        setCountries([...countriesCache]);
       }
     },
-    [fetchCountries, countries]
+    [countries, countriesCache]
   );
-  function handleClickNext() {
-    (async function() {
-      if (countries.length < numberOfOptions) {
-        await fetchCountries();
-      } else {
-        pickCountries(countries);
-      }
-    })();
-  }
+
   return (
     <div className="App" style={{ background: "#cc8833", height: "100vh" }}>
       <RegionHeader></RegionHeader>
-      <CurrentCountry country={countryOptions[0]}></CurrentCountry>
+      <CurrentCountry
+        country={
+          countryOptions[Math.floor(Math.random() * countryOptions.length)]
+        }
+      ></CurrentCountry>
       <CapitalsList capitals={countryOptions}></CapitalsList>
-      <button onClick={handleClickNext}>Next Question</button>
+      <button onClick={pickRandomCountries}>Next Question</button>
     </div>
   );
 }
