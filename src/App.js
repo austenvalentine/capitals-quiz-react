@@ -3,6 +3,10 @@ import sliceRandomSubset from "./helpers/helper.js";
 import RegionHeader from "./components/RegionHeader";
 import CurrentCountry from "./components/CurrentCountry";
 import CapitalsList from "./components/CapitalsList";
+
+// TODO =====
+// rename states to something more intuitive.
+
 // Capitals Quiz - breakdown
 // 1. download list of countries and add to the countries array (App.js)
 // 2. pick 4 countries at random for multiple-choice options (App.js)
@@ -22,6 +26,7 @@ function App() {
       numberOfOptions,
       countries
     );
+    // TODO === don't use underscore. Go with newCountries.
     setCountries(_countries);
     setCountryOptions(options);
   }
@@ -29,6 +34,8 @@ function App() {
   // 1. download list of countries, add to cache and add to "deck"
   // ===============================================
   useEffect(function() {
+    // Getting "maximum update depth exceeded" warning.
+    // May need to implement a debounce for initial render.
     const fetchCountries = async function() {
       const response = await fetch(
         "https://restcountries.eu/rest/v2/region/africa"
