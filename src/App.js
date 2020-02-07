@@ -15,31 +15,37 @@ import CapitalsList from "./components/CapitalsList";
 // 5. go back to step 1
 
 function App() {
+  // Set a number of multiple-choice options
   const numberOfOptions = 4;
-  const [countries, setCountries] = useState([]);
+  // State to store the data fetched from the API. It does not get modified.
   const [allCountries, setAllCountries] = useState([]);
+  // State to store a copy of the data fetched from the API. Gets modified
+  // every time a new question is generated and is replenished when it does
+  // enough data to generate the next question.
+  const [countries, setCountries] = useState([]);
+  // state to store the options for the current multiple-choice question
   const [countryOptions, setCountryOptions] = useState([]);
 
-  // pick the countries at random
   function pickRandomCountries() {
-    const { set: newCountries, subset: options } = sliceRandomSubset(
-      numberOfOptions,
-      countries
-    );
-    // TODO === don't use underscore. Go with newCountries.
+    // randomly splice the options in the new question from the list of
+    // countries
+    const {
+      set: newCountries,
+      subset: options
+    } = sliceRandomSubset(numberOfOptions, [...countries]);
+    // update the countries list and the quiz question
     setCountries(newCountries);
     setCountryOptions(options);
-
+    // replenish the countries list if the subset is too small to
+    // generate the next question
     if (newCountries && newCountries.length < numberOfOptions) {
-      setCountries([...allCountries]);
+      setCountries(allCountries);
     }
   }
   // ===============================================
   // 1. download list of countries, add to cache and add to "deck"
   // ===============================================
   useEffect(function() {
-    // Getting "maximum update depth exceeded" warning.
-    // May need to implement a debounce for initial render.
     const fetchCountries = async function() {
       const response = await fetch(
         "https://restcountries.eu/rest/v2/region/africa"
