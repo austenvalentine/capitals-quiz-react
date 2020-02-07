@@ -42,9 +42,7 @@ function App() {
       setCountries(allCountries);
     }
   }
-  // ===============================================
-  // 1. download list of countries, add to cache and add to "deck"
-  // ===============================================
+
   useEffect(function() {
     const fetchCountries = async function() {
       const response = await fetch(
@@ -55,7 +53,10 @@ function App() {
         numberOfOptions,
         data
       );
+      // store the full set of data in state
       setAllCountries(data);
+      // give the modified set of data to the current list of countries and
+      // and the next question's options.
       setCountries(newCountries);
       setCountryOptions(options);
     };
