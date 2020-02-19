@@ -3,18 +3,20 @@ import React from "react";
 import CapitalOption from "./CapitalOption";
 
 function CapitalsList(props) {
-  const { capitals } = props;
-  console.log("CapitalList capitals: ", capitals);
+  const { countries, compareAnswer } = props;
 
   return (
     <div>
       <ul>
-        {[
-          <CapitalOption capital={capitals[0] || "hi"} key="a"></CapitalOption>,
-          <CapitalOption capital={capitals[1] || "hi"} key="b"></CapitalOption>,
-          <CapitalOption capital={capitals[2] || "hi"} key="c"></CapitalOption>,
-          <CapitalOption capital={capitals[3] || "hi"} key="d"></CapitalOption>
-        ]}
+        {countries.map(function(country) {
+          return (
+            <CapitalOption
+              country={country}
+              key={country.capital}
+              compareAnswer={compareAnswer}
+            ></CapitalOption>
+          );
+        })}
       </ul>
     </div>
   );

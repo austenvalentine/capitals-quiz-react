@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import sliceRandomSubset from "./helpers/helper.js";
 import RegionHeader from "./components/RegionHeader";
 import CurrentCountry from "./components/CurrentCountry";
+import OKModal from "./components/OKModal";
 import CapitalsList from "./components/CapitalsList";
 
 // TODO =====
@@ -25,6 +26,14 @@ function App() {
   const [countries, setCountries] = useState([]);
   // state to store the options for the current multiple-choice question
   const [countryOptions, setCountryOptions] = useState([]);
+  // state to store the correct answer
+  const [correctAnswer, setCorrectAnswer] = useState({});
+  // state to store user's choice
+  const [userChoice, setUserChoice] = useState({});
+  // state to toggle the user-confirm modal
+  const [modalIsVisible, setModalIsVisible] = useState(false);
+  // state to set a response message in the modal
+  const [modalMessage, setModalMessage] = useState("");
 
   function pickRandomCountries() {
     // randomly splice the options in the new question from the list of
@@ -33,14 +42,42 @@ function App() {
       set: newCountries,
       subset: options
     } = sliceRandomSubset(numberOfOptions, [...countries]);
-    // update the countries list and the quiz question
+    // choose a correct answer from the options
+    const newCorrectAnswer =
+      options[Math.floor(Math.random() * options.length)];
+    // update the countries list, correct answer, and the quiz question
     setCountries(newCountries);
+    setCorrectAnswer(newCorrectAnswer);
     setCountryOptions(options);
+
     // replenish the countries list if the subset is too small to
     // generate the next question
     if (newCountries && newCountries.length < numberOfOptions) {
       setCountries(allCountries);
     }
+  }
+
+  // give user a chance to read the message before continuing the game
+  function closeOKModal() {
+    if (userChoice === correctAnswer) {
+      console.log("CORRECT: pickRandomCountries");
+      pickRandomCountries();
+    }
+    setModalIsVisible(false);
+  }
+
+  function compareAnswer(country) {
+    setUserChoice(country);
+    if (country === correctAnswer) {
+      setModalMessage(
+        `Yes! ${correctAnswer.capital} is the capital of ${correctAnswer.name}!`
+      );
+    } else {
+      setModalMessage(
+        `No! ${country.capital} is not the capital of ${correctAnswer.name}`
+      );
+    }
+    setModalIsVisible(true);
   }
 
   useEffect(function() {
@@ -53,6 +90,11 @@ function App() {
         numberOfOptions,
         data
       );
+      // choose a correct answer from the options
+      const newCorrectAnswer =
+        options[Math.floor(Math.random() * options.length)];
+      // store the correct answer
+      setCorrectAnswer(newCorrectAnswer);
       // store the full set of data in state
       setAllCountries(data);
       // give the modified set of data to the current list of countries and
@@ -68,13 +110,15 @@ function App() {
 
   return (
     <div className="App" style={{ background: "#cc8833", height: "100vh" }}>
+      {modalIsVisible && (
+        <OKModal closeOKModal={closeOKModal} message={modalMessage}></OKModal>
+      )}
       <RegionHeader></RegionHeader>
-      <CurrentCountry
-        country={
-          countryOptions[Math.floor(Math.random() * countryOptions.length)]
-        }
-      ></CurrentCountry>
-      <CapitalsList capitals={countryOptions}></CapitalsList>
+      <CurrentCountry country={correctAnswer}></CurrentCountry>
+      <CapitalsList
+        countries={countryOptions}
+        compareAnswer={compareAnswer}
+      ></CapitalsList>
       <button onClick={pickRandomCountries}>Next Question</button>
     </div>
   );
